@@ -54,7 +54,7 @@ result app(int argc, char * argv[])
         version = static_cast<unsigned int>(std::stoul(argv[3]));
     } catch (std::invalid_argument const & ex)
     {
-        return error(ex.what());
+        return error("Invalid argument for clang-format version.");
     }
 
     return parse_clang_format_settings(argv[1], argv[2], version);
@@ -68,7 +68,7 @@ int main(int argc, char * argv[])
     {
         const auto err = res.get_error();
         std::cout << "Error: " << err.msg << "\n";
-        std::cout << "in function \"" << err.func << "\" at line " << err.line;
+        std::cout << "Function \"" << err.func << "\" at line " << err.line << "\n";
 
         return EXIT_FAILURE;
     }
