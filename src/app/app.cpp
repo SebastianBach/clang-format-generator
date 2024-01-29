@@ -52,7 +52,7 @@ result app(int argc, char * argv[])
     try
     {
         version = static_cast<unsigned int>(std::stoul(argv[3]));
-    } catch (std::invalid_argument const & ex)
+    } catch (std::invalid_argument const &)
     {
         return error("Invalid argument for clang-format version.");
     }
