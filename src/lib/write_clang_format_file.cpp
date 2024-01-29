@@ -31,6 +31,14 @@ inline bool in_version(unsigned int version, VERSION introduced, VERSION outdate
     return version >= version_to_uint(introduced) && version < version_to_uint(outdated);
 }
 
+inline std::string format_version(unsigned int version)
+{
+    const auto major = version / 10;
+    const auto minor = version - (major * 10);
+    return std::to_string(major) + "." + std::to_string(minor);
+}
+
+
 struct writer
 {
     writer(const std::filesystem::path & file, unsigned int v) : stream(file), version(v) {}
@@ -43,6 +51,7 @@ struct writer
             return false;
 
         stream << std::boolalpha;
+        stream << "# created for clang-format version " << format_version(version) << "\n\n";
         return true;
     }
 
