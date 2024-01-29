@@ -51,7 +51,7 @@ result app(int argc, char * argv[])
 
     try
     {
-        version = std::stoul(argv[3]);
+        version = static_cast<unsigned int>(std::stoul(argv[3]));
     } catch (std::invalid_argument const & ex)
     {
         return error(ex.what());

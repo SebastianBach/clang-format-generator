@@ -24,9 +24,9 @@ class [[nodiscard]] result : private std::optional<error>
   public:
     constexpr result() noexcept : std::optional<error>(){};
     constexpr result(const error & err) noexcept : std::optional<error>(err){};
-    constexpr [[nodiscard]] auto is_error() const noexcept { return has_value(); }
-    constexpr [[nodiscard]] auto is_success() const noexcept { return !is_error(); }
-    constexpr [[nodiscard]] const auto get_error(error invalid = error{
+    constexpr auto is_error() const noexcept { return has_value(); }
+    constexpr auto is_success() const noexcept { return !is_error(); }
+    constexpr const auto get_error(error invalid = error{
                                                      "invalid error request."}) const noexcept
     {
         if (is_error())
