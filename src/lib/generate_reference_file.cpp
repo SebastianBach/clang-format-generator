@@ -32,6 +32,10 @@ public:
         {
             int a = 5;
         }
+        else
+        {
+            int a = 6;
+        }
     }
 private:
     int values[5];
