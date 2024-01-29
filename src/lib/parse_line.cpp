@@ -1,4 +1,4 @@
-#include "lib.h"
+#include "clang_format_lib.h"
 #include <functional>
 #include <vector>
 
