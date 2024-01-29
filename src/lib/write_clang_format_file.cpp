@@ -7,7 +7,7 @@
 namespace clang_format_lib
 {
 
-inline unsigned int version_to_uint(VERSION v)
+inline auto version_to_uint(VERSION v)
 {
     static std::map<VERSION, unsigned int> map_v_uint{
         {VERSION::v3_5, 35u},   {VERSION::v3_7, 37u},   {VERSION::v3_8, 38u},   {VERSION::v5_0, 50u},
@@ -21,17 +21,17 @@ inline unsigned int version_to_uint(VERSION v)
     return 999u;
 }
 
-inline bool in_version(unsigned int version, VERSION introduced)
+inline auto in_version(unsigned int version, VERSION introduced)
 {
     return version >= version_to_uint(introduced);
 }
 
-inline bool in_version(unsigned int version, VERSION introduced, VERSION outdated)
+inline auto in_version(unsigned int version, VERSION introduced, VERSION outdated)
 {
     return version >= version_to_uint(introduced) && version < version_to_uint(outdated);
 }
 
-inline std::string format_version(unsigned int version)
+inline auto format_version(unsigned int version)
 {
     const auto major = version / 10;
     const auto minor = version - (major * 10);
@@ -45,7 +45,7 @@ struct writer
 
     ~writer() { stream.close(); }
 
-    bool open()
+    auto open()
     {
         if (!stream.is_open())
             return false;
@@ -70,7 +70,7 @@ struct writer
             stream << "# " << s.command << ": ?\n";
     }
 
-    template <typename VALUE> bool in_version(const setting<VALUE> & s) const noexcept
+    template <typename VALUE> auto in_version(const setting<VALUE> & s) const noexcept
     {
         return clang_format_lib::in_version(version, s.version);
     }

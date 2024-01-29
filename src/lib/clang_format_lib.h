@@ -30,7 +30,7 @@ template <typename ARG> struct setting
 
     template <typename IN> void cast(const IN & input) { data = static_cast<ARG>(input); }
 
-    constexpr bool is_set() const noexcept { return data.has_value(); }
+    constexpr auto is_set() const noexcept { return data.has_value(); }
 
     constexpr const ARG & get_value() const { return data.value(); }
 

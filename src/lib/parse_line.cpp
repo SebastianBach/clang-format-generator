@@ -4,7 +4,7 @@
 
 namespace clang_format_lib
 {
-inline bool find(const std::string & line, const char * search)
+inline auto find(const std::string & line, const char * search)
 {
     return line.find(search) != std::string::npos;
 }
