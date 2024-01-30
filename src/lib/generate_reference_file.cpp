@@ -1,8 +1,8 @@
 #include "clang_format_lib.h"
 
 #include <functional>
-#include <vector>
 #include <sstream>
+#include <vector>
 
 namespace clang_format_lib
 {
@@ -47,12 +47,12 @@ private:
 
 void generate_reference_file(std::vector<std::string> & lines)
 {
-   std::istringstream iss(ref_content);
+    std::istringstream iss(ref_content);
 
     std::string line;
-    while (std::getline(iss, line)) {
-            lines.push_back(line);
-        }
-   
+    while (std::getline(iss, line))
+    {
+        lines.push_back(line);
+    }
 }
 } // namespace clang_format_lib

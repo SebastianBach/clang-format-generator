@@ -46,16 +46,20 @@ struct writer
     void head()
     {
         lines.reserve(24);
+
+        lines.push_back("# created with https://github.com/SebastianBach/clang-format-generator");
+
         const auto line = "# created for clang-format version " + format_version(version);
         lines.push_back(line);
+
         new_line();
     }
 
-    void write(const char * text) { lines.push_back(std::string{text}); }
+    void write(const char * text) { lines.push_back({text}); }
 
     void new_line() { lines.push_back({}); }
 
-    template <typename VALUE> void write(const setting<VALUE> & s)
+    template <typename VALUE> void write(const setting<VALUE> & s, bool indentation = false)
     {
         if (!clang_format_lib::in_version(version, s.version))
             return;
@@ -63,7 +67,12 @@ struct writer
         if (s.is_set())
         {
             std::ostringstream oss;
-            oss << std::boolalpha << s.command << ": " << s.get_value();
+            oss << std::boolalpha;
+
+            if (indentation)
+                oss << "  ";
+
+            oss << s.command << ": " << s.get_value();
             lines.push_back(oss.str());
         }
         else
@@ -107,13 +116,13 @@ void write_clang_format_file(const clang_format_settings & settings, unsigned in
         writer.write("BreakBeforeBraces: Custom");
         writer.write("BraceWrapping:");
 
-        writer.write(settings.BreakBeforeBraces.AfterClass);
-        writer.write(settings.BreakBeforeBraces.AfterFunction);
-        writer.write(settings.BreakBeforeBraces.AfterNamespace);
-        writer.write(settings.BreakBeforeBraces.AfterStruct);
-        writer.write(settings.BreakBeforeBraces.AfterControlStatement);
-        writer.write(settings.BreakBeforeBraces.AfterEnum);
-        writer.write(settings.BreakBeforeBraces.BeforeElse);
+        writer.write(settings.BreakBeforeBraces.AfterClass, true);
+        writer.write(settings.BreakBeforeBraces.AfterFunction, true);
+        writer.write(settings.BreakBeforeBraces.AfterNamespace, true);
+        writer.write(settings.BreakBeforeBraces.AfterStruct, true);
+        writer.write(settings.BreakBeforeBraces.AfterControlStatement, true);
+        writer.write(settings.BreakBeforeBraces.AfterEnum, true);
+        writer.write(settings.BreakBeforeBraces.BeforeElse, true);
     }
 
     writer.new_line();
@@ -131,8 +140,8 @@ void write_clang_format_file(const clang_format_settings & settings, unsigned in
         writer.write("SpacesInParens: Custom");
         writer.write("SpacesInParensOptions:");
 
-        writer.write(settings.SpacesInParens.InConditionalStatements);
-        writer.write(settings.SpacesInParens.Other);
+        writer.write(settings.SpacesInParens.InConditionalStatements, true);
+        writer.write(settings.SpacesInParens.Other, true);
     }
 
     writer.new_line();
@@ -174,8 +183,8 @@ void write_clang_format_file(const clang_format_settings & settings, unsigned in
         writer.write("SpaceBeforeParens: Custom");
         writer.write("SpaceBeforeParensOptions:");
 
-        writer.write(settings.SpaceBeforeParens.AfterControlStatements);
-        writer.write(settings.SpaceBeforeParens.AfterFunctionDefinitionName);
+        writer.write(settings.SpaceBeforeParens.AfterControlStatements, true);
+        writer.write(settings.SpaceBeforeParens.AfterFunctionDefinitionName, true);
     }
 }
 

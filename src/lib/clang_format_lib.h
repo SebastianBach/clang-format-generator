@@ -66,13 +66,13 @@ struct clang_format_settings
 
     struct
     {
-        setting<bool> AfterClass{"  AfterClass", VERSION::v3_8};
-        setting<bool> AfterNamespace{"  AfterNamespace", VERSION::v3_8};
-        setting<bool> AfterStruct{"  AfterStruct", VERSION::v3_8};
-        setting<bool> AfterFunction{"  AfterFunction", VERSION::v3_8};
-        setting<bool> AfterControlStatement{"  AfterControlStatement", VERSION::v3_8};
-        setting<bool> AfterEnum{"  AfterEnum", VERSION::v3_8};
-        setting<bool> BeforeElse{"  BeforeElse", VERSION::v3_8};
+        setting<bool> AfterClass{"AfterClass", VERSION::v3_8};
+        setting<bool> AfterNamespace{"AfterNamespace", VERSION::v3_8};
+        setting<bool> AfterStruct{"AfterStruct", VERSION::v3_8};
+        setting<bool> AfterFunction{"AfterFunction", VERSION::v3_8};
+        setting<bool> AfterControlStatement{"AfterControlStatement", VERSION::v3_8};
+        setting<bool> AfterEnum{"AfterEnum", VERSION::v3_8};
+        setting<bool> BeforeElse{"BeforeElse", VERSION::v3_8};
 
     } BreakBeforeBraces;
 
@@ -86,8 +86,8 @@ struct clang_format_settings
 
     struct
     {
-        setting<bool> InConditionalStatements{"  InConditionalStatements", VERSION::v17_0};
-        setting<bool> Other{"  Other", VERSION::v17_0};
+        setting<bool> InConditionalStatements{"InConditionalStatements", VERSION::v17_0};
+        setting<bool> Other{"Other", VERSION::v17_0};
 
         setting<bool> SpacesInConditionalStatement{"SpacesInConditionalStatement", VERSION::v10_0};
         setting<bool> SpacesInParentheses{"SpacesInParentheses", VERSION::v3_7};
@@ -97,8 +97,8 @@ struct clang_format_settings
     struct
     {
         setting<const char *> SpaceBeforeParens{"SpaceBeforeParens", VERSION::v3_5};
-        setting<bool> AfterControlStatements{"  AfterControlStatements", VERSION::v14_0};
-        setting<bool> AfterFunctionDefinitionName{"  AfterFunctionDefinitionName", VERSION::v14_0};
+        setting<bool> AfterControlStatements{"AfterControlStatements", VERSION::v14_0};
+        setting<bool> AfterFunctionDefinitionName{"AfterFunctionDefinitionName", VERSION::v14_0};
 
     } SpaceBeforeParens;
 };
