@@ -109,10 +109,10 @@ void parse_line(const std::string & line, clang_format_settings & settings) noex
 
 void parse_lines(const std::vector<std::string> & lines, clang_format_settings & settings) noexcept;
 
-bool generate_reference_file(const std::filesystem::path & file);
+void generate_reference_file(std::vector<std::string> & lines);
 
-bool write_clang_format_file(const clang_format_settings & settings, const std::filesystem::path & file,
-                             unsigned int version);
+void write_clang_format_file(const clang_format_settings & settings, unsigned int version,
+                             std::vector<std::string> & lines);
 
 } // namespace clang_format_lib
 

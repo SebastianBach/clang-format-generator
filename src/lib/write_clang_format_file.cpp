@@ -1,6 +1,5 @@
 #include "clang_format_lib.h"
 #include <cstring>
-#include <fstream>
 #include <iomanip>
 #include <map>
 
@@ -38,26 +37,23 @@ inline auto format_version(unsigned int version)
     return std::to_string(major) + "." + std::to_string(minor);
 }
 
-
 struct writer
 {
-    writer(const std::filesystem::path & file, unsigned int v) : stream(file), version(v) {}
+    writer(std::vector<std::string> & l, unsigned int v) : lines(l), version(v) {}
 
-    ~writer() { stream.close(); }
+    ~writer() {}
 
-    auto open()
+    void head()
     {
-        if (!stream.is_open())
-            return false;
-
-        stream << std::boolalpha;
-        stream << "# created for clang-format version " << format_version(version) << "\n\n";
-        return true;
+        lines.reserve(24);
+        const auto line = "# created for clang-format version " + format_version(version);
+        lines.push_back(line);
+        new_line();
     }
 
-    void write(const char * text) { stream << text << "\n"; }
+    void write(const char * text) { lines.push_back(std::string{text}); }
 
-    void new_line() { stream << "\n"; }
+    void new_line() { lines.push_back({}); }
 
     template <typename VALUE> void write(const setting<VALUE> & s)
     {
@@ -65,9 +61,17 @@ struct writer
             return;
 
         if (s.is_set())
-            stream << s.command << ": " << s.get_value() << "\n";
+        {
+            std::ostringstream oss;
+            oss << std::boolalpha << s.command << ": " << s.get_value();
+            lines.push_back(oss.str());
+        }
         else
-            stream << "# " << s.command << ": ?\n";
+        {
+            std::ostringstream oss;
+            oss << "# " << s.command << ": ?";
+            lines.push_back(oss.str());
+        }
     }
 
     template <typename VALUE> auto in_version(const setting<VALUE> & s) const noexcept
@@ -75,17 +79,16 @@ struct writer
         return clang_format_lib::in_version(version, s.version);
     }
 
-    std::ofstream stream;
+    std::vector<std::string> & lines;
     const unsigned int version;
 };
 
-bool write_clang_format_file(const clang_format_settings & settings, const std::filesystem::path & file,
-                             unsigned int version)
+void write_clang_format_file(const clang_format_settings & settings, unsigned int version,
+                             std::vector<std::string> & lines)
 {
-    writer writer(file, version);
+    writer writer(lines, version);
 
-    if (!writer.open())
-        return false;
+    writer.head();
 
     writer.write(settings.Language);
 
@@ -174,8 +177,6 @@ bool write_clang_format_file(const clang_format_settings & settings, const std::
         writer.write(settings.SpaceBeforeParens.AfterControlStatements);
         writer.write(settings.SpaceBeforeParens.AfterFunctionDefinitionName);
     }
-
-    return true;
 }
 
 } // namespace clang_format_lib

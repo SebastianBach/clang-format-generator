@@ -1,7 +1,8 @@
 #include "clang_format_lib.h"
-#include <fstream>
+
 #include <functional>
 #include <vector>
+#include <sstream>
 
 namespace clang_format_lib
 {
@@ -44,17 +45,14 @@ private:
 } // namespace lib
 )";
 
-bool generate_reference_file(const std::filesystem::path & file)
+void generate_reference_file(std::vector<std::string> & lines)
 {
-    std::ofstream reference_file(file);
+   std::istringstream iss(ref_content);
 
-    if (!reference_file.is_open())
-        return false;
-
-    reference_file << ref_content;
-
-    reference_file.close();
-
-    return true;
+    std::string line;
+    while (std::getline(iss, line)) {
+            lines.push_back(line);
+        }
+   
 }
 } // namespace clang_format_lib

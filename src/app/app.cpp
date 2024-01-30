@@ -1,8 +1,35 @@
 #include "clang_format_lib.h"
 #include "result.h"
-#include <cstdlib>
 #include <fstream>
 #include <iostream>
+
+result write_to_file(const std::filesystem::path & dst, const std::vector<std::string> & lines)
+{
+    std::ofstream file_stream(dst);
+
+    if (!file_stream.is_open())
+        return error("Could not open clang-format file to write.");
+
+    for (const auto & line : lines)
+        file_stream << line << "\n";
+
+    file_stream.close();
+
+    return SUCCESS;
+}
+
+result create_clang_format_file(const clang_format_lib::clang_format_settings & settings,
+                                const std::string & dst, unsigned int version)
+{
+    std::vector<std::string> lines;
+
+    clang_format_lib::write_clang_format_file(settings, version, lines);
+
+    if (lines.empty())
+        return error("could not create clang-format styles.");
+
+    return write_to_file(dst, lines);
+}
 
 result parse_clang_format_settings(const std::string & src, const std::string & dst, unsigned int version)
 {
@@ -28,15 +55,19 @@ result parse_clang_format_settings(const std::string & src, const std::string & 
 
     file.close();
 
-    return clang_format_lib::write_clang_format_file(settings, dst, version)
-               ? SUCCESS
-               : error("Error writing the clang format file.");
+    return create_clang_format_file(settings, dst, version);
 }
 
 result make_reference_file(const std::filesystem::path & path)
 {
-    return clang_format_lib::generate_reference_file(path) ? SUCCESS
-                                                           : error("Could not create reference file.");
+    std::vector<std::string> lines;
+
+    clang_format_lib::generate_reference_file(lines);
+
+    if (lines.empty())
+        return error("Could not obtain reference file data.");
+
+    return write_to_file(path, lines);
 }
 
 result app(int argc, char * argv[])
@@ -69,9 +100,7 @@ int main(int argc, char * argv[])
         const auto err = res.get_error();
         std::cout << "Error: " << err.msg << "\n";
         std::cout << "Function \"" << err.func << "\" at line " << err.line << "\n";
-
-        return EXIT_FAILURE;
     }
 
-    return EXIT_SUCCESS;
+    return res.code();
 }
