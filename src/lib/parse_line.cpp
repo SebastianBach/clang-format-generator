@@ -59,28 +59,28 @@ void parse_line(const std::string & line, clang_format_settings & settings) noex
 
     if (find(line, "int* "))
     {
-        settings.Alignment.PointerAlignment.set("Left");
+        settings.Alignment.PointerAlignment.set(ALIGNMENT::LEFT);
     }
     else if (find(line, "int * "))
     {
-        settings.Alignment.PointerAlignment.set("Middle");
+        settings.Alignment.PointerAlignment.set(ALIGNMENT::MIDDLE);
     }
     else if (find(line, "int *"))
     {
-        settings.Alignment.PointerAlignment.set("Right");
+        settings.Alignment.PointerAlignment.set(ALIGNMENT::RIGHT);
     }
 
     if (find(line, "float& "))
     {
-        settings.Alignment.ReferenceAlignment.set("Left");
+        settings.Alignment.ReferenceAlignment.set(ALIGNMENT::LEFT);
     }
     else if (find(line, "float & "))
     {
-        settings.Alignment.ReferenceAlignment.set("Middle");
+        settings.Alignment.ReferenceAlignment.set(ALIGNMENT::MIDDLE);
     }
     else if (find(line, "float &"))
     {
-        settings.Alignment.ReferenceAlignment.set("Right");
+        settings.Alignment.ReferenceAlignment.set(ALIGNMENT::RIGHT);
     }
 
     if (find(line, "( v )"))
@@ -131,6 +131,7 @@ void parse_lines(const std::vector<std::string> & lines, clang_format_settings &
             consecutive_empty_lines++;
             if (consecutive_empty_lines > max_consecutive_empty_lines)
                 max_consecutive_empty_lines = consecutive_empty_lines;
+            continue;
         }
         else
         {

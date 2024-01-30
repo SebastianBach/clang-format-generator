@@ -3,7 +3,9 @@
 #include <fstream>
 #include <iostream>
 
-result write_to_file(const std::filesystem::path & dst, const std::vector<std::string> & lines)
+using text_file_content = std::vector<std::string>;
+
+result write_to_file(const std::filesystem::path & dst, const text_file_content & lines)
 {
     std::ofstream file_stream(dst);
 
@@ -21,7 +23,7 @@ result write_to_file(const std::filesystem::path & dst, const std::vector<std::s
 result create_clang_format_file(const clang_format_lib::clang_format_settings & settings,
                                 const std::string & dst, unsigned int version)
 {
-    std::vector<std::string> lines;
+    text_file_content lines;
 
     clang_format_lib::write_clang_format_file(settings, version, lines);
 
@@ -44,7 +46,7 @@ result parse_clang_format_settings(const std::string & src, const std::string & 
     clang_format_lib::clang_format_settings settings;
 
     std::string line;
-    std::vector<std::string> lines;
+    text_file_content lines;
     while (std::getline(file, line))
     {
         clang_format_lib::parse_line(line, settings);
@@ -60,7 +62,7 @@ result parse_clang_format_settings(const std::string & src, const std::string & 
 
 result make_reference_file(const std::filesystem::path & path)
 {
-    std::vector<std::string> lines;
+    text_file_content lines;
 
     clang_format_lib::generate_reference_file(lines);
 

@@ -1,5 +1,4 @@
 #include "clang_format_lib.h"
-#include <cstring>
 #include <iomanip>
 #include <map>
 
@@ -37,6 +36,24 @@ inline auto format_version(unsigned int version)
     return std::to_string(major) + "." + std::to_string(minor);
 }
 
+template <typename ARG> void value_to_string(std::ostringstream & oss, const ARG & arg) { oss << arg; }
+
+template <> void value_to_string(std::ostringstream & oss, const ALIGNMENT & arg)
+{
+    switch (arg)
+    {
+    case (ALIGNMENT::LEFT):
+        oss << "Left";
+        return;
+    case (ALIGNMENT::MIDDLE):
+        oss << "Middle";
+        return;
+    case (ALIGNMENT::RIGHT):
+        oss << "Right";
+        return;
+    }
+}
+
 struct writer
 {
     writer(std::vector<std::string> & l, unsigned int v) : lines(l), version(v) {}
@@ -72,7 +89,9 @@ struct writer
             if (indentation)
                 oss << "  ";
 
-            oss << s.command << ": " << s.get_value();
+            oss << s.command << ": ";
+            value_to_string(oss, s.get_value());
+
             lines.push_back(oss.str());
         }
         else
@@ -158,8 +177,8 @@ void write_clang_format_file(const clang_format_settings & settings, unsigned in
     {
         if (settings.Alignment.PointerAlignment.is_set() && settings.Alignment.ReferenceAlignment.is_set())
         {
-            if (std::strcmp(settings.Alignment.PointerAlignment.get_value(),
-                            settings.Alignment.ReferenceAlignment.get_value()) == 0)
+            if (settings.Alignment.PointerAlignment.get_value() ==
+                settings.Alignment.ReferenceAlignment.get_value())
             {
                 writer.write("ReferenceAlignment: Pointer");
             }

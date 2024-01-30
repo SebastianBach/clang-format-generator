@@ -24,7 +24,7 @@ enum class VERSION
 
 template <typename ARG> struct setting
 {
-    constexpr setting(const char * cmd, VERSION v = VERSION::v3_5) : command(cmd), version(v) {}
+    constexpr explicit setting(const char * cmd, VERSION v = VERSION::v3_5) : command(cmd), version(v) {}
 
     void set(ARG arg) { data = arg; }
 
@@ -39,6 +39,18 @@ template <typename ARG> struct setting
     const VERSION version;
 };
 
+enum class ALIGNMENT
+{
+    LEFT,
+    MIDDLE,
+    RIGHT
+};
+
+using setting_text = setting<const char*>;
+using setting_number = setting<unsigned int>;
+using setting_switch = setting<bool>;
+using setting_alignment = setting<ALIGNMENT>;
+
 struct clang_format_settings
 {
     clang_format_settings()
@@ -47,58 +59,58 @@ struct clang_format_settings
         UseTab.set("Never");
     }
 
-    setting<const char *> Language{"Language", VERSION::v3_5};
-    setting<const char *> UseTab{"UseTab", VERSION::v3_7};
+    setting_text Language{"Language", VERSION::v3_5};
+    setting_text UseTab{"UseTab", VERSION::v3_7};
 
-    setting<unsigned int> ColumnLimit{"ColumnLimit", VERSION::v3_7};
-    setting<unsigned int> IndentWidth{"IndentWidth", VERSION::v3_7};
+    setting_number ColumnLimit{"ColumnLimit", VERSION::v3_7};
+    setting_number IndentWidth{"IndentWidth", VERSION::v3_7};
 
-    setting<unsigned int> MaxEmptyLinesToKeep{"MaxEmptyLinesToKeep", VERSION::v3_7};
+    setting_number MaxEmptyLinesToKeep{"MaxEmptyLinesToKeep", VERSION::v3_7};
 
     struct
     {
-        setting<const char *> PointerAlignment{"PointerAlignment", VERSION::v3_7};
-        setting<const char *> ReferenceAlignment{"ReferenceAlignment", VERSION::v13_0};
+        setting_alignment PointerAlignment{"PointerAlignment", VERSION::v3_7};
+        setting_alignment ReferenceAlignment{"ReferenceAlignment", VERSION::v13_0};
 
     } Alignment;
 
-    setting<bool> FixNamespaceComments{"FixNamespaceComments", VERSION::v5_0};
+    setting_switch FixNamespaceComments{"FixNamespaceComments", VERSION::v5_0};
 
     struct
     {
-        setting<bool> AfterClass{"AfterClass", VERSION::v3_8};
-        setting<bool> AfterNamespace{"AfterNamespace", VERSION::v3_8};
-        setting<bool> AfterStruct{"AfterStruct", VERSION::v3_8};
-        setting<bool> AfterFunction{"AfterFunction", VERSION::v3_8};
-        setting<bool> AfterControlStatement{"AfterControlStatement", VERSION::v3_8};
-        setting<bool> AfterEnum{"AfterEnum", VERSION::v3_8};
-        setting<bool> BeforeElse{"BeforeElse", VERSION::v3_8};
+        setting_switch AfterClass{"AfterClass", VERSION::v3_8};
+        setting_switch AfterNamespace{"AfterNamespace", VERSION::v3_8};
+        setting_switch AfterStruct{"AfterStruct", VERSION::v3_8};
+        setting_switch AfterFunction{"AfterFunction", VERSION::v3_8};
+        setting_switch AfterControlStatement{"AfterControlStatement", VERSION::v3_8};
+        setting_switch AfterEnum{"AfterEnum", VERSION::v3_8};
+        setting_switch BeforeElse{"BeforeElse", VERSION::v3_8};
 
     } BreakBeforeBraces;
 
-    setting<bool> SpacesInSquareBrackets{"SpacesInSquareBrackets", VERSION::v3_7};
+    setting_switch SpacesInSquareBrackets{"SpacesInSquareBrackets", VERSION::v3_7};
 
     struct
     {
-        setting<bool> SpaceBeforeAssignmentOperators{"SpaceBeforeAssignmentOperators", VERSION::v3_7};
-        setting<bool> SpaceBeforeSquareBrackets{"SpaceBeforeSquareBrackets", VERSION::v10_0};
+        setting_switch SpaceBeforeAssignmentOperators{"SpaceBeforeAssignmentOperators", VERSION::v3_7};
+        setting_switch SpaceBeforeSquareBrackets{"SpaceBeforeSquareBrackets", VERSION::v10_0};
     } SpaceBefore;
 
     struct
     {
-        setting<bool> InConditionalStatements{"InConditionalStatements", VERSION::v17_0};
-        setting<bool> Other{"Other", VERSION::v17_0};
+        setting_switch InConditionalStatements{"InConditionalStatements", VERSION::v17_0};
+        setting_switch Other{"Other", VERSION::v17_0};
 
-        setting<bool> SpacesInConditionalStatement{"SpacesInConditionalStatement", VERSION::v10_0};
-        setting<bool> SpacesInParentheses{"SpacesInParentheses", VERSION::v3_7};
+        setting_switch SpacesInConditionalStatement{"SpacesInConditionalStatement", VERSION::v10_0};
+        setting_switch SpacesInParentheses{"SpacesInParentheses", VERSION::v3_7};
 
     } SpacesInParens;
 
     struct
     {
-        setting<const char *> SpaceBeforeParens{"SpaceBeforeParens", VERSION::v3_5};
-        setting<bool> AfterControlStatements{"AfterControlStatements", VERSION::v14_0};
-        setting<bool> AfterFunctionDefinitionName{"AfterFunctionDefinitionName", VERSION::v14_0};
+        setting_text SpaceBeforeParens{"SpaceBeforeParens", VERSION::v3_5};
+        setting_switch AfterControlStatements{"AfterControlStatements", VERSION::v14_0};
+        setting_switch AfterFunctionDefinitionName{"AfterFunctionDefinitionName", VERSION::v14_0};
 
     } SpaceBeforeParens;
 };
