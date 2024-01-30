@@ -3,6 +3,7 @@
 
 #include <optional>
 #include <source_location>
+#include <cstdlib>
 
 struct error
 {
@@ -26,8 +27,13 @@ class [[nodiscard]] result : private std::optional<error>
     constexpr result(const error & err) noexcept : std::optional<error>(err){};
     constexpr auto is_error() const noexcept { return has_value(); }
     constexpr auto is_success() const noexcept { return !is_error(); }
-    constexpr const auto get_error(error invalid = error{
-                                                     "invalid error request."}) const noexcept
+    constexpr auto code() const noexcept
+    {
+        if (is_error())
+            return EXIT_FAILURE;
+        return EXIT_SUCCESS;
+    }
+    constexpr const auto get_error(error invalid = error{"invalid error request."}) const noexcept
     {
         if (is_error())
             return value();
