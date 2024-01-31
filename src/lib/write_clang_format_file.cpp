@@ -12,8 +12,7 @@ inline auto version_to_uint(VERSION v)
         {VERSION::v10_0, 100u}, {VERSION::v13_0, 130u}, {VERSION::v14_0, 140u}, {VERSION::v16_0, 160u},
         {VERSION::v17_0, 170u}, {VERSION::v18_0, 180u}};
 
-    auto it = map_v_uint.find(v);
-    if (it != map_v_uint.end())
+    if (auto it = map_v_uint.find(v); it != map_v_uint.end())
         return it->second;
 
     return 999u;
@@ -81,9 +80,10 @@ struct writer
         if (!clang_format_lib::in_version(version, s.version))
             return;
 
+        std::ostringstream oss;
+
         if (s.is_set())
         {
-            std::ostringstream oss;
             oss << std::boolalpha;
 
             if (indentation)
@@ -91,15 +91,13 @@ struct writer
 
             oss << s.command << ": ";
             value_to_string(oss, s.get_value());
-
-            lines.push_back(oss.str());
         }
         else
         {
-            std::ostringstream oss;
             oss << "# " << s.command << ": ?";
-            lines.push_back(oss.str());
         }
+
+        lines.push_back(oss.str());
     }
 
     template <typename VALUE> auto in_version(const setting<VALUE> & s) const noexcept
