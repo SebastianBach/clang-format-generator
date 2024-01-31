@@ -20,3 +20,6 @@ add_test(NAME app_create_clang_format_3_7 COMMAND app ref.cpp output_37 37)
 add_test(NAME app_create_clang_format_10_0 COMMAND app ref.cpp output_100 100)
 add_test(NAME app_create_clang_format_14_0 COMMAND app ref.cpp output_140 140)
 add_test(NAME app_create_clang_format_17_0 COMMAND app ref.cpp output_170 170)
+
+add_test(NAME app_invalid_version COMMAND app ref.cpp output_invalid_version abc)
+set_tests_properties(app_invalid_version PROPERTIES WILL_FAIL TRUE)
