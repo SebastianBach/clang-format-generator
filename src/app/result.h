@@ -35,9 +35,7 @@ class [[nodiscard]] result : private std::optional<error>
     }
     constexpr const auto get_error(error invalid = error{"invalid error request."}) const noexcept
     {
-        if (is_error())
-            return value();
-        return invalid;
+        return value_or(invalid);
     }
 };
 static constexpr result SUCCESS;
