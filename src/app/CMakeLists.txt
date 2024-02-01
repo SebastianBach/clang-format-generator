@@ -23,3 +23,15 @@ add_test(NAME app_create_clang_format_17_0 COMMAND app ref.cpp output_170 170)
 
 add_test(NAME app_invalid_version COMMAND app ref.cpp output_invalid_version abc)
 set_tests_properties(app_invalid_version PROPERTIES WILL_FAIL TRUE)
+
+
+add_executable(app_test)
+target_sources(app_test PRIVATE     run.test.cpp
+                                    run.cpp
+                                    run.h)
+
+target_link_libraries(app_test PRIVATE lib)
+target_link_libraries(app_test PRIVATE test_framework)
+target_include_directories(app_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+add_test(NAME app_test COMMAND app_test)
