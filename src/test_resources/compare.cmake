@@ -1,0 +1,10 @@
+file(READ ${REFERENCE_FILE} REFERENCE_CONTENT)
+file(READ ${OUTPUT_FILE} OUTPUT_CONTENT)
+
+message("compare files")
+
+string(COMPARE EQUAL "${REFERENCE_CONTENT}" "${OUTPUT_CONTENT}" FILES_MATCH)
+
+if (NOT FILES_MATCH)
+  message(FATAL_ERROR "Test failed.")
+endif()

@@ -3,11 +3,11 @@
 #include <string>
 #include <vector>
 
-struct argv
+struct args
 {
     void add(const char * arg) { data.push_back({arg}); }
 
-    char ** get_list()
+    char ** get()
     {
         list.clear();
         list.reserve(data.size());
@@ -29,79 +29,81 @@ struct argv
 test_result test_run()
 {
     {
-        // missing arguments
+        TEST_CASE("no arguments")
 
         const auto res = run(0, nullptr);
         CHECK_TRUE(res.is_error())
     }
 
     {
-        // missing arguments
+        TEST_CASE("missing arguments")
 
-        argv argv;
-        argv.add("programName");
+        args args;
+        args.add("programName");
 
-        const auto res = run(argv.count(), argv.get_list());
+        const auto res = run(args.count(), args.get());
         CHECK_TRUE(res.is_error())
     }
 
     {
-        argv argv;
-        argv.add("programName");
-        argv.add("new_source.cpp");
+        TEST_CASE("reference file creation")
 
-        const auto res = run(argv.count(), argv.get_list());
+        args args;
+        args.add("programName");
+        args.add("new_source.cpp");
+
+        const auto res = run(args.count(), args.get());
         CHECK_TRUE(res.is_success())
     }
 
     {
-        // missing version argument
+        TEST_CASE("missing version argument")
 
-        argv argv;
-        argv.add("programName");
-        argv.add("new_source.cpp");
-        argv.add("output");
+        args args;
+        args.add("programName");
+        args.add("new_source.cpp");
+        args.add("output");
 
-        const auto res = run(argv.count(), argv.get_list());
+        const auto res = run(args.count(), args.get());
         CHECK_TRUE(res.is_error())
     }
 
     {
-        // invalid version argument
+        TEST_CASE("invalid version argument")
 
-        argv argv;
-        argv.add("programName");
-        argv.add("new_source.cpp");
-        argv.add("output");
-        argv.add("abc");
+        args args;
+        args.add("programName");
+        args.add("new_source.cpp");
+        args.add("output");
+        args.add("abc");
 
-        const auto res = run(argv.count(), argv.get_list());
+        const auto res = run(args.count(), args.get());
         CHECK_TRUE(res.is_error())
     }
 
     {
-        // invalid source argument
+        TEST_CASE("invalid source argument")
 
-        argv argv;
-        argv.add("programName");
-        argv.add("no_source.cpp");
-        argv.add("output");
-        argv.add("140");
+        args args;
+        args.add("programName");
+        args.add("no_source.cpp");
+        args.add("output");
+        args.add("140");
 
-        const auto res = run(argv.count(), argv.get_list());
+        const auto res = run(args.count(), args.get());
         CHECK_TRUE(res.is_error())
     }
 
     {
-        // invalid source argument
+        TEST_CASE("clang format file creation")
 
-        argv argv;
-        argv.add("programName");
-        argv.add("new_source.cpp");
-        argv.add("output");
-        argv.add("140");
+        args args;
+        args.add("programName");
+        args.add("new_source.cpp");
+        args.add("output");
+        args.add("140");
 
-        const auto res = run(argv.count(), argv.get_list());
+        const auto res = run(args.count(), args.get());
         CHECK_TRUE(res.is_success())
     }
 
@@ -110,7 +112,6 @@ test_result test_run()
 
 int main()
 {
-
     RUN(test_run())
 
     return EXIT_SUCCESS;
