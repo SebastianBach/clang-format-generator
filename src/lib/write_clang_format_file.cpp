@@ -1,82 +1,120 @@
 #include "clang_format_lib.h"
-#include <cstring>
-#include <fstream>
 #include <iomanip>
 #include <map>
 
 namespace clang_format_lib
 {
 
-inline unsigned int version_to_uint(VERSION v)
+inline auto version_to_uint(VERSION v)
 {
     static std::map<VERSION, unsigned int> map_v_uint{
         {VERSION::v3_5, 35u},   {VERSION::v3_7, 37u},   {VERSION::v3_8, 38u},   {VERSION::v5_0, 50u},
         {VERSION::v10_0, 100u}, {VERSION::v13_0, 130u}, {VERSION::v14_0, 140u}, {VERSION::v16_0, 160u},
         {VERSION::v17_0, 170u}, {VERSION::v18_0, 180u}};
 
-    auto it = map_v_uint.find(v);
-    if (it != map_v_uint.end())
+    if (auto it = map_v_uint.find(v); it != map_v_uint.end())
         return it->second;
 
     return 999u;
 }
 
-inline bool in_version(unsigned int version, VERSION introduced)
+inline auto in_version(unsigned int version, VERSION introduced)
 {
     return version >= version_to_uint(introduced);
 }
 
-inline bool in_version(unsigned int version, VERSION introduced, VERSION outdated)
+inline auto in_version(unsigned int version, VERSION introduced, VERSION outdated)
 {
     return version >= version_to_uint(introduced) && version < version_to_uint(outdated);
 }
 
+inline auto format_version(unsigned int version)
+{
+    const auto major = version / 10;
+    const auto minor = version - (major * 10);
+    return std::to_string(major) + "." + std::to_string(minor);
+}
+
+template <typename ARG> void value_to_string(std::ostringstream & oss, const ARG & arg) { oss << arg; }
+
+template <> void value_to_string(std::ostringstream & oss, const ALIGNMENT & arg)
+{
+    switch (arg)
+    {
+    case (ALIGNMENT::LEFT):
+        oss << "Left";
+        return;
+    case (ALIGNMENT::MIDDLE):
+        oss << "Middle";
+        return;
+    case (ALIGNMENT::RIGHT):
+        oss << "Right";
+        return;
+    }
+}
+
 struct writer
 {
-    writer(const std::filesystem::path & file, unsigned int v) : stream(file), version(v) {}
+    writer(std::vector<std::string> & l, unsigned int v) : lines(l), version(v) {}
 
-    ~writer() { stream.close(); }
+    ~writer() {}
 
-    bool open()
+    void head()
     {
-        if (!stream.is_open())
-            return false;
+        lines.reserve(24);
 
-        stream << std::boolalpha;
-        return true;
+        lines.push_back("# created with https://github.com/SebastianBach/clang-format-generator");
+
+        const auto line = "# created for clang-format version " + format_version(version);
+        lines.push_back(line);
+
+        new_line();
     }
 
-    void write(const char * text) { stream << text << "\n"; }
+    void write(const char * text) { lines.push_back({text}); }
 
-    void new_line() { stream << "\n"; }
+    void new_line() { lines.push_back({}); }
 
-    template <typename VALUE> void write(const setting<VALUE> & s)
+    template <typename VALUE> void write(const setting<VALUE> & s, bool indentation = false)
     {
         if (!clang_format_lib::in_version(version, s.version))
             return;
 
+        std::ostringstream oss;
+
         if (s.is_set())
-            stream << s.command << ": " << s.get_value() << "\n";
+        {
+            oss << std::boolalpha;
+
+            if (indentation)
+                oss << "  ";
+
+            oss << s.command << ": ";
+            value_to_string(oss, s.get_value());
+        }
         else
-            stream << "# " << s.command << ": ?\n";
+        {
+            oss << "# " << s.command << ": ?";
+        }
+
+        lines.push_back(oss.str());
     }
 
-    template <typename VALUE> bool in_version(const setting<VALUE> & s) const noexcept
+    template <typename VALUE> auto in_version(const setting<VALUE> & s) const noexcept
     {
         return clang_format_lib::in_version(version, s.version);
     }
 
-    std::ofstream stream;
+    std::vector<std::string> & lines;
     const unsigned int version;
 };
 
-bool write_clang_format_file(const clang_format_settings & settings, const std::filesystem::path & file,
-                             unsigned int version)
+void write_clang_format_file(const clang_format_settings & settings, unsigned int version,
+                             std::vector<std::string> & lines)
 {
-    writer writer(file, version);
+    writer writer(lines, version);
 
-    if (!writer.open())
-        return false;
+    writer.head();
 
     writer.write(settings.Language);
 
@@ -95,13 +133,13 @@ bool write_clang_format_file(const clang_format_settings & settings, const std::
         writer.write("BreakBeforeBraces: Custom");
         writer.write("BraceWrapping:");
 
-        writer.write(settings.BreakBeforeBraces.AfterClass);
-        writer.write(settings.BreakBeforeBraces.AfterFunction);
-        writer.write(settings.BreakBeforeBraces.AfterNamespace);
-        writer.write(settings.BreakBeforeBraces.AfterStruct);
-        writer.write(settings.BreakBeforeBraces.AfterControlStatement);
-        writer.write(settings.BreakBeforeBraces.AfterEnum);
-        writer.write(settings.BreakBeforeBraces.BeforeElse);
+        writer.write(settings.BreakBeforeBraces.AfterClass, true);
+        writer.write(settings.BreakBeforeBraces.AfterFunction, true);
+        writer.write(settings.BreakBeforeBraces.AfterNamespace, true);
+        writer.write(settings.BreakBeforeBraces.AfterStruct, true);
+        writer.write(settings.BreakBeforeBraces.AfterControlStatement, true);
+        writer.write(settings.BreakBeforeBraces.AfterEnum, true);
+        writer.write(settings.BreakBeforeBraces.BeforeElse, true);
     }
 
     writer.new_line();
@@ -119,8 +157,8 @@ bool write_clang_format_file(const clang_format_settings & settings, const std::
         writer.write("SpacesInParens: Custom");
         writer.write("SpacesInParensOptions:");
 
-        writer.write(settings.SpacesInParens.InConditionalStatements);
-        writer.write(settings.SpacesInParens.Other);
+        writer.write(settings.SpacesInParens.InConditionalStatements, true);
+        writer.write(settings.SpacesInParens.Other, true);
     }
 
     writer.new_line();
@@ -137,8 +175,8 @@ bool write_clang_format_file(const clang_format_settings & settings, const std::
     {
         if (settings.Alignment.PointerAlignment.is_set() && settings.Alignment.ReferenceAlignment.is_set())
         {
-            if (std::strcmp(settings.Alignment.PointerAlignment.get_value(),
-                            settings.Alignment.ReferenceAlignment.get_value()) == 0)
+            if (settings.Alignment.PointerAlignment.get_value() ==
+                settings.Alignment.ReferenceAlignment.get_value())
             {
                 writer.write("ReferenceAlignment: Pointer");
             }
@@ -162,11 +200,9 @@ bool write_clang_format_file(const clang_format_settings & settings, const std::
         writer.write("SpaceBeforeParens: Custom");
         writer.write("SpaceBeforeParensOptions:");
 
-        writer.write(settings.SpaceBeforeParens.AfterControlStatements);
-        writer.write(settings.SpaceBeforeParens.AfterFunctionDefinitionName);
+        writer.write(settings.SpaceBeforeParens.AfterControlStatements, true);
+        writer.write(settings.SpaceBeforeParens.AfterFunctionDefinitionName, true);
     }
-
-    return true;
 }
 
 } // namespace clang_format_lib
