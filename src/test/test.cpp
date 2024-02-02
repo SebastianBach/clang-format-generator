@@ -87,7 +87,21 @@ test_result test_parse_line()
     return TEST_OK;
 }
 
-test_result test_write_clang_format_file() { return TEST_OK; }
+test_result test_write_clang_format_file()
+{
+    {
+        TEST_CASE("basic clang format file test")
+
+        clang_format_lib::clang_format_settings settings;
+        std::vector<std::string> result;
+
+        clang_format_lib::write_clang_format_file(settings, 170, result);
+
+        CHECK_FALSE(result.empty())
+    }
+
+    return TEST_OK;
+}
 
 int main()
 {
