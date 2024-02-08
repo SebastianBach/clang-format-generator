@@ -13,20 +13,22 @@ struct args
         list.reserve(data.size());
 
         for (auto & d : data)
-        {
             list.push_back(d.data());
-        }
 
         return list.data();
     }
 
     int count() const { return static_cast<int>(data.size()); }
 
+    operator int() const noexcept { return count(); }
+
+    operator char **() noexcept { return get(); }
+
     std::vector<std::string> data;
     std::vector<char *> list;
 };
 
-test_result test_run()
+auto test_run()
 {
     {
         TEST_CASE("no arguments")
@@ -41,7 +43,7 @@ test_result test_run()
         args args;
         args.add("programName");
 
-        const auto res = run(args.count(), args.get());
+        const auto res = run(args, args);
         CHECK_TRUE(res.is_error())
     }
 
@@ -52,7 +54,7 @@ test_result test_run()
         args.add("programName");
         args.add("new_source.cpp");
 
-        const auto res = run(args.count(), args.get());
+        const auto res = run(args, args);
         CHECK_TRUE(res.is_success())
     }
 
@@ -64,7 +66,7 @@ test_result test_run()
         args.add("new_source.cpp");
         args.add("output");
 
-        const auto res = run(args.count(), args.get());
+        const auto res = run(args, args);
         CHECK_TRUE(res.is_error())
     }
 
@@ -77,7 +79,7 @@ test_result test_run()
         args.add("output");
         args.add("abc");
 
-        const auto res = run(args.count(), args.get());
+        const auto res = run(args, args);
         CHECK_TRUE(res.is_error())
     }
 
@@ -90,7 +92,7 @@ test_result test_run()
         args.add("output");
         args.add("140");
 
-        const auto res = run(args.count(), args.get());
+        const auto res = run(args, args);
         CHECK_TRUE(res.is_error())
     }
 
@@ -103,11 +105,11 @@ test_result test_run()
         args.add("output");
         args.add("140");
 
-        const auto res = run(args.count(), args.get());
+        const auto res = run(args, args);
         CHECK_TRUE(res.is_success())
     }
 
-    return TEST_OK;
+    return TEST_OK();
 }
 
 int main()

@@ -2,7 +2,7 @@
 #include "test_framework.h"
 #include <cstring>
 
-test_result test_settings()
+auto test_settings()
 {
     {
         TEST_CASE("base settings test")
@@ -28,10 +28,10 @@ test_result test_settings()
         CHECK_FALSE(exampleSetting.get_value())
     }
 
-    return TEST_OK;
+    return TEST_OK();
 }
 
-test_result test_parse_line()
+auto test_parse_line()
 {
     {
         TEST_CASE("base parsing test")
@@ -84,10 +84,10 @@ test_result test_parse_line()
         CHECK_TRUE(std::strcmp(spaceBefore, "Always") == 0)
     }
 
-    return TEST_OK;
+    return TEST_OK();
 }
 
-test_result test_write_clang_format_file()
+auto test_write_clang_format_file()
 {
     {
         TEST_CASE("basic clang format file test")
@@ -100,7 +100,7 @@ test_result test_write_clang_format_file()
         CHECK_FALSE(result.empty())
     }
 
-    return TEST_OK;
+    return TEST_OK();
 }
 
 int main()
