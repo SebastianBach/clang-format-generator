@@ -28,6 +28,8 @@ struct args
     std::vector<char *> list;
 };
 
+auto run_args(args & a) { return run(a.count(), a.get()); }
+
 auto test_run()
 {
     {
@@ -43,7 +45,7 @@ auto test_run()
         args args;
         args.add("programName");
 
-        const auto res = run(args, args);
+        const auto res = run_args(args);
         CHECK_TRUE(res.is_error())
     }
 
@@ -54,7 +56,7 @@ auto test_run()
         args.add("programName");
         args.add("new_source.cpp");
 
-        const auto res = run(args, args);
+        const auto res = run_args(args);
         CHECK_TRUE(res.is_success())
     }
 
@@ -66,7 +68,7 @@ auto test_run()
         args.add("new_source.cpp");
         args.add("output");
 
-        const auto res = run(args, args);
+        const auto res = run_args(args);
         CHECK_TRUE(res.is_error())
     }
 
@@ -79,7 +81,7 @@ auto test_run()
         args.add("output");
         args.add("abc");
 
-        const auto res = run(args, args);
+        const auto res = run_args(args);
         CHECK_TRUE(res.is_error())
     }
 
@@ -92,11 +94,11 @@ auto test_run()
         args.add("output");
         args.add("140");
 
-        const auto res = run(args, args);
+        const auto res = run_args(args);
         CHECK_TRUE(res.is_error())
     }
 
-        {
+    {
         TEST_CASE("empty arguments")
 
         args args;
@@ -105,7 +107,7 @@ auto test_run()
         args.add("");
         args.add("");
 
-        const auto res = run(args, args);
+        const auto res = run_args(args);
         CHECK_TRUE(res.is_error())
     }
 
@@ -118,7 +120,7 @@ auto test_run()
         args.add("output");
         args.add("140");
 
-        const auto res = run(args, args);
+        const auto res = run_args(args);
         CHECK_TRUE(res.is_success())
     }
 
