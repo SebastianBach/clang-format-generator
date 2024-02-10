@@ -55,7 +55,15 @@ if(CMAKE_COMPILER_IS_GNUCXX)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -g")
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
     endif()
-    
+
+    option(BUILD_GPROF "gprof Build" OFF)
+
+    if(BUILD_GPROF)
+        message(STATUS "Build with gprof")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
+    endif()
+
 endif()
 
 add_subdirectory(src)
