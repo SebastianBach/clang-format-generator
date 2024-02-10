@@ -109,7 +109,7 @@ auto test_run()
         CHECK_TRUE(res.is_success())
     }
 
-    return TEST_OK();
+    return test_result::ok();
 }
 
 int main()

@@ -1,6 +1,5 @@
 #include "clang_format_lib.h"
 #include "test_framework.h"
-#include <cstring>
 
 auto test_settings()
 {
@@ -28,63 +27,7 @@ auto test_settings()
         CHECK_FALSE(exampleSetting.get_value())
     }
 
-    return TEST_OK();
-}
-
-auto test_parse_line()
-{
-    {
-        TEST_CASE("base parsing test")
-
-        clang_format_lib::clang_format_settings settings;
-
-        auto & exampleSetting = settings.BreakBeforeBraces.AfterClass;
-
-        CHECK_FALSE(exampleSetting.is_set())
-
-        clang_format_lib::parse_line("class SomeClass {", settings);
-
-        CHECK_TRUE(exampleSetting.is_set())
-
-        CHECK_FALSE(exampleSetting.get_value())
-
-        clang_format_lib::parse_line("class SomeClass", settings);
-
-        CHECK_TRUE(exampleSetting.is_set())
-
-        CHECK_TRUE(exampleSetting.get_value())
-    }
-
-    {
-        TEST_CASE("multi-line parsing test")
-
-        clang_format_lib::clang_format_settings settings;
-
-        auto & SpaceBeforeParens = settings.SpaceBeforeParens.SpaceBeforeParens;
-        auto & MaxEmptyLinesToKeep = settings.MaxEmptyLinesToKeep;
-
-        CHECK_FALSE(SpaceBeforeParens.is_set())
-        CHECK_FALSE(MaxEmptyLinesToKeep.is_set())
-
-        std::vector<std::string> lines;
-        lines.push_back("  if ( ");
-        lines.push_back("");
-        lines.push_back("");
-        lines.push_back("  ReferenceClass ( ");
-
-        clang_format_lib::parse_lines(lines, settings);
-
-        CHECK_TRUE(SpaceBeforeParens.is_set())
-        CHECK_TRUE(MaxEmptyLinesToKeep.is_set())
-
-        CHECK_TRUE(MaxEmptyLinesToKeep.get_value() == 2)
-
-        const char * spaceBefore = SpaceBeforeParens.get_value();
-
-        CHECK_TRUE(std::strcmp(spaceBefore, "Always") == 0)
-    }
-
-    return TEST_OK();
+    return test_result::ok();
 }
 
 auto test_write_clang_format_file()
@@ -100,14 +43,45 @@ auto test_write_clang_format_file()
         CHECK_FALSE(result.empty())
     }
 
-    return TEST_OK();
+    return test_result::ok();
+}
+
+auto test_parser()
+{
+    {
+        TEST_CASE("basic parser test")
+
+        clang_format_lib::clang_format_settings settings;
+        clang_format_lib::parser parser(settings);
+
+        parser.parse_line("");
+        parser.parse_line("namespace test");
+        parser.parse_line("{");
+        parser.parse_line(" if (");
+        parser.parse_line("");
+        parser.parse_line("");
+        parser.parse_line("}");
+        parser.finish();
+
+        const auto & settingBreak = settings.BreakBeforeBraces.AfterNamespace;
+
+        CHECK_TRUE(settingBreak.is_set());
+        CHECK_TRUE(settingBreak.get_value());
+
+        const auto & settingEmpyLines = settings.MaxEmptyLinesToKeep;
+
+        CHECK_TRUE(settingEmpyLines.is_set());
+        CHECK_TRUE(settingEmpyLines.get_value() == 2);
+    }
+
+    return test_result::ok();
 }
 
 int main()
 {
     RUN(test_settings())
-    RUN(test_parse_line())
     RUN(test_write_clang_format_file())
+    RUN(test_parser())
 
     return EXIT_SUCCESS;
 }

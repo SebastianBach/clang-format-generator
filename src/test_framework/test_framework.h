@@ -8,15 +8,25 @@
 
 class [[nodiscard]] test_result
 {
-  public:
+  private:
     test_result() noexcept {}
-    test_result(const char * test_case, const char * test,
-                const std::source_location & loc = std::source_location::current()) noexcept
+
+    test_result(const char * test_case, const char * test, const std::source_location & loc) noexcept
         : m_error(std::make_unique<error_info>(test, test_case, loc.line(), loc.function_name()))
     {
     }
 
+  public:
+    static test_result ok() noexcept { return test_result(); }
+
+    static test_result failure(const char * test_case, const char * test,
+                               const std::source_location & loc = std::source_location::current()) noexcept
+    {
+        return test_result{test_case, test, loc};
+    }
+
     auto failed() const noexcept { return m_error.get() != nullptr; }
+
     void print() const noexcept
     {
         if (failed())
@@ -44,19 +54,17 @@ class [[nodiscard]] test_result
     const std::unique_ptr<error_info> m_error;
 };
 
-inline auto TEST_OK() { return test_result(); }
-
 #define TO_STRING(s) #s
 
 #define TEST_CASE(TEST) const char * __testcase = TEST;
 
 #define CHECK_TRUE(TEST)                                                                                  \
     if ((TEST) == false)                                                                                  \
-        return test_result(__testcase, TO_STRING(TEST));
+        return test_result::failure(__testcase, TO_STRING(TEST));
 
 #define CHECK_FALSE(TEST)                                                                                 \
     if ((TEST) == true)                                                                                   \
-        return test_result(__testcase, TO_STRING(TEST));
+        return test_result::failure(__testcase, TO_STRING(TEST));
 
 #define RUN(TEST)                                                                                         \
     if (const auto testresult = TEST; testresult.failed())                                                \

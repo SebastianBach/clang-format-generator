@@ -18,9 +18,9 @@ struct test_data
 class ReferenceClass 
 {
 public:
-    ReferenceClass(int* v, float& ref)
+    ReferenceClass(int* value, float& ref)
     {
-        if (v) 
+        if (value) 
         {
             int a = 5;
         }
