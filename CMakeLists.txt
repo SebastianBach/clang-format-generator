@@ -30,4 +30,13 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
                         -Werror)
 endif()
 
+option(BUILD_COVERAGE "Coverage Build" OFF)
+
+if(BUILD_COVERAGE)
+    if(CMAKE_COMPILER_IS_GNUCXX)
+        set(CMAKE_CXX_FLAGS "--coverage -fprofile-arcs -ftest-coverage")
+        set(CMAKE_EXE_LINKER_FLAGS "--coverage -fprofile-arcs -ftest-coverage")
+    endif()
+endif()
+
 add_subdirectory(src)
