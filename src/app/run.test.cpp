@@ -96,6 +96,19 @@ auto test_run()
         CHECK_TRUE(res.is_error())
     }
 
+        {
+        TEST_CASE("empty arguments")
+
+        args args;
+        args.add("programName");
+        args.add("");
+        args.add("");
+        args.add("");
+
+        const auto res = run(args, args);
+        CHECK_TRUE(res.is_error())
+    }
+
     {
         TEST_CASE("clang format file creation")
 

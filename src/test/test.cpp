@@ -19,7 +19,7 @@ auto test_test_framework()
 
         const auto res = test_failure();
 
-        CHECK_TRUE(res.failed());
+        CHECK_TRUE(res.failed())
 
         res.print();
     }

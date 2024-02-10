@@ -33,7 +33,7 @@ class [[nodiscard]] test_result
         {
             auto * error = m_error.get();
             std::cout << "Error in test case \"" << error->test_case << "\", check \"" << error->test
-                      << "\"  at line " << error->line << " in function \"" << error->func << "\"\n";
+                      << "\" at line " << error->line << " in function \"" << error->func << "\"\n";
         }
     }
 
