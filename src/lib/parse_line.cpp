@@ -1,5 +1,4 @@
 #include "clang_format_lib.h"
-#include <any>
 #include <functional>
 #include <vector>
 
@@ -21,25 +20,12 @@ struct topic_info
     bool done = false;
 };
 
-struct topic_info_data
-{
-    std::function<bool(line_info & info, std::any & data)> func;
-    bool done = false;
-    std::any func_data;
-};
-
 template <typename FUNC> void add_topic(std::vector<topic_info> & topics, FUNC && f)
 {
     topics.emplace_back(topic_info{f, false});
 }
 
-template <typename DATA, typename FUNC>
-void add_topic_data(std::vector<topic_info_data> & topics, FUNC && f)
-{
-    topics.emplace_back(topic_info_data{f, false, DATA()});
-}
-
-void set_topics(std::vector<topic_info> & topics, std::vector<topic_info_data> & topics_data)
+void set_topics(std::vector<topic_info> & topics)
 {
     add_topic(topics, [](line_info & info) {
         const auto result = info.find("namespace") && info.without("// namespace");
@@ -166,7 +152,7 @@ void set_topics(std::vector<topic_info> & topics, std::vector<topic_info_data> &
             info.s.SpacesInParens.InConditionalStatements.set(true);
             info.s.SpacesInParens.SpacesInConditionalStatement.set(true);
         }
-        else if (info.find("(value"))
+        else if (info.find("(value)"))
         {
             info.s.SpacesInParens.InConditionalStatements.set(false);
             info.s.SpacesInParens.SpacesInConditionalStatement.set(false);
@@ -203,7 +189,7 @@ void set_topics(std::vector<topic_info> & topics, std::vector<topic_info_data> &
         return result;
     });
 
-    struct max_consecutive_empty_lines
+    struct
     {
         unsigned int max_consecutive_empty_lines = 0u;
         unsigned int consecutive_empty_lines = 0u;
@@ -216,53 +202,49 @@ void set_topics(std::vector<topic_info> & topics, std::vector<topic_info_data> &
         }
 
         void reset() { consecutive_empty_lines = 0u; }
-    };
+    } empty_lines;
 
-    add_topic_data<max_consecutive_empty_lines>(topics_data, [](line_info & info, std::any & data) {
-        auto & d = std::any_cast<max_consecutive_empty_lines &>(data);
-
+    add_topic(topics, [empty_lines](line_info & info) mutable {
         if (info.finish)
         {
-            info.s.MaxEmptyLinesToKeep.set(d.max_consecutive_empty_lines);
+            info.s.MaxEmptyLinesToKeep.set(empty_lines.max_consecutive_empty_lines);
             return true;
         }
 
         if (info.line.empty())
-            d.increment();
+            empty_lines.increment();
         else
-            d.reset();
+            empty_lines.reset();
 
         return false;
     });
 
-    struct space_after_function
+    struct
     {
         bool space_after_if = false;
         bool space_after_function = false;
-    };
+    } space_after;
 
-    add_topic_data<space_after_function>(topics_data, [](line_info & info, std::any & data) {
-        auto & d = std::any_cast<space_after_function &>(data);
-
-        if (info.finish || (d.space_after_if && d.space_after_function))
+    add_topic(topics, [space_after](line_info & info) mutable {
+        if (info.finish || (space_after.space_after_if && space_after.space_after_function))
         {
-            if (d.space_after_function && d.space_after_if)
+            if (space_after.space_after_function && space_after.space_after_if)
                 info.s.SpaceBeforeParens.SpaceBeforeParens.set("Always");
-            else if (!d.space_after_function && !d.space_after_if)
+            else if (!space_after.space_after_function && !space_after.space_after_if)
                 info.s.SpaceBeforeParens.SpaceBeforeParens.set("Never");
-            else if (!d.space_after_function && d.space_after_if)
+            else if (!space_after.space_after_function && space_after.space_after_if)
                 info.s.SpaceBeforeParens.SpaceBeforeParens.set("ControlStatements");
 
-            info.s.SpaceBeforeParens.AfterControlStatements.set(d.space_after_if);
-            info.s.SpaceBeforeParens.AfterFunctionDefinitionName.set(d.space_after_function);
+            info.s.SpaceBeforeParens.AfterControlStatements.set(space_after.space_after_if);
+            info.s.SpaceBeforeParens.AfterFunctionDefinitionName.set(space_after.space_after_function);
 
             return true;
         }
 
         if (info.find("if ("))
-            d.space_after_if = true;
+            space_after.space_after_if = true;
         else if (info.find("ReferenceClass ("))
-            d.space_after_function = true;
+            space_after.space_after_function = true;
 
         return false;
     });
@@ -276,40 +258,34 @@ class parser::impl
     impl(clang_format_settings & s) : settings(s)
     {
         topics.reserve(15);
-        set_topics(topics, topics_data);
+        set_topics(topics);
     }
 
     void parse_line(const std::string & line)
     {
         line_info info{line, settings, false};
 
-        for (auto & t : topics)
-            if (!t.done)
-                t.done = t.func(info);
-
-        for (auto & t : topics_data)
-            if (!t.done)
-                t.done = t.func(info, t.func_data);
+        run_checks(info);
     }
 
     void finish()
     {
         line_info info{"", settings, true};
 
+        run_checks(info);
+    }
+
+    void run_checks(line_info & info)
+    {
         for (auto & t : topics)
             if (!t.done)
                 t.done = t.func(info);
-
-        for (auto & t : topics_data)
-            if (!t.done)
-                t.done = t.func(info, t.func_data);
     }
 
     ~impl() = default;
 
     clang_format_settings & settings;
     std::vector<topic_info> topics;
-    std::vector<topic_info_data> topics_data;
 };
 
 // parser
