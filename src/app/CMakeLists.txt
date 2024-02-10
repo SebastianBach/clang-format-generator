@@ -56,6 +56,12 @@ add_test(NAME app_create_clang_format_17_0_compare COMMAND ${CMAKE_COMMAND}
 add_test(NAME app_invalid_version COMMAND app ref.cpp output_invalid_version abc)
 set_tests_properties(app_invalid_version PROPERTIES WILL_FAIL TRUE)
 
+# empty sourc file
+
+set(EMPTY_SOURCE_FILE ${PROJECT_SOURCE_DIR}/src/test_resources/empty.cpp)
+add_test(NAME app_empty_source COMMAND app ${EMPTY_SOURCE_FILE} output_empty_source 140)
+set_tests_properties(app_empty_source PROPERTIES WILL_FAIL TRUE)
+
 # unit test
 
 add_executable(app_test)
