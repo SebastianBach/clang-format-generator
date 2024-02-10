@@ -54,17 +54,40 @@ class [[nodiscard]] test_result
     const std::unique_ptr<error_info> m_error;
 };
 
+class test_case
+{
+  public:
+    test_case(const char * t) : _test_case(t) {}
+    ~test_case()
+    {
+        if (_success)
+            std::cout << "Success: " << _test_case << "\n";
+        else
+            std::cout << "Failure: " << _test_case << "\n";
+    }
+
+    const char * err() noexcept
+    {
+        _success = false;
+        return _test_case;
+    }
+
+  private:
+    const char * const _test_case;
+    bool _success = true;
+};
+
 #define TO_STRING(s) #s
 
-#define TEST_CASE(TEST) const char * __testcase = TEST;
+#define TEST_CASE(TEST) test_case __testcase{TEST};
 
 #define CHECK_TRUE(TEST)                                                                                  \
     if ((TEST) == false)                                                                                  \
-        return test_result::failure(__testcase, TO_STRING(TEST));
+        return test_result::failure(__testcase.err(), TO_STRING(TEST));
 
 #define CHECK_FALSE(TEST)                                                                                 \
     if ((TEST) == true)                                                                                   \
-        return test_result::failure(__testcase, TO_STRING(TEST));
+        return test_result::failure(__testcase.err(), TO_STRING(TEST));
 
 #define RUN(TEST)                                                                                         \
     if (const auto testresult = TEST; testresult.failed())                                                \

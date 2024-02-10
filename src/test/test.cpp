@@ -1,6 +1,32 @@
 #include "clang_format_lib.h"
 #include "test_framework.h"
 
+auto test_failure()
+{
+    {
+        TEST_CASE("This should fail")
+
+        CHECK_TRUE(false);
+    }
+
+    return test_result::ok();
+}
+
+auto test_test_framework()
+{
+    {
+        TEST_CASE("Expected failed test")
+
+        const auto res = test_failure();
+
+        CHECK_TRUE(res.failed());
+
+        res.print();
+    }
+
+    return test_result::ok();
+}
+
 auto test_settings()
 {
     {
@@ -77,11 +103,26 @@ auto test_parser()
     return test_result::ok();
 }
 
+auto test_version()
+{
+    {
+        TEST_CASE("test version")
+
+        const char * version = clang_format_lib::version();
+        CHECK_TRUE(version != nullptr);
+        CHECK_TRUE(version[0] != '\0');
+    }
+
+    return test_result::ok();
+}
+
 int main()
 {
+    RUN(test_test_framework())
     RUN(test_settings())
     RUN(test_write_clang_format_file())
     RUN(test_parser())
+    RUN(test_version())
 
     return EXIT_SUCCESS;
 }
