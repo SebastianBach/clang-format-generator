@@ -15,14 +15,14 @@ jobs:
     - name: build directory
       run: mkdir build
 
-    - name: build directory
-      run: cd build
-
     - name: CMake
       run: cmake ..
+      working-directory: ./build
 
     - name: Build 
       run: cmake --build . --config Release
+      working-directory: ./build
 
     - name: Run tests (optional)
       run: ctest -C Release  -VV
+      working-directory: ./build
