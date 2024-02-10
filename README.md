@@ -1,6 +1,8 @@
 
 # Clang Format Generator
 
+[![build jobs](https://github.com/SebastianBach/clang-format-generator/actions/workflows/build.yml/badge.svg)](https://github.com/SebastianBach/clang-format-generator/actions/workflows/build.yml)
+
 Command line tool that creates a ```clang-format``` file from a formatted C++ source code file.
 
 See https://clang.llvm.org/docs/ClangFormat.html 
