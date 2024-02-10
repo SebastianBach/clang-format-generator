@@ -19,10 +19,59 @@ jobs:
       run: cmake ..
       working-directory: ./build
 
-    - name: Build 
+    - name: build 
       run: cmake --build . --config Release
       working-directory: ./build
 
-    - name: Run tests (optional)
+    - name: tests
       run: ctest -C Release  -VV
       working-directory: ./build
+
+  build_ubsan:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      name: Check out the repository code
+
+    - name: dependencies
+      run: sudo apt-get update && sudo apt-get install -y build-essential cmake
+
+    - name: build directory
+      run: mkdir build
+
+    - name: CMake
+      run: cmake -DBUILD_UBSAN=ON ..
+      working-directory: ./build
+
+    - name: build 
+      run: cmake --build .
+      working-directory: ./build
+
+    - name: tests
+      run: ctest
+      working-directory: ./build
+      
+  build_asan:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      name: Check out the repository code
+
+    - name: dependencies
+      run: sudo apt-get update && sudo apt-get install -y build-essential cmake
+
+    - name: build directory
+      run: mkdir build
+
+    - name: CMake
+      run: cmake -DBUILD_ASAN=ON ..
+      working-directory: ./build
+
+    - name: build 
+      run: cmake --build . 
+      working-directory: ./build
+
+    - name: tests
+      run: ctest
+      working-directory: ./build
+
