@@ -7,7 +7,7 @@ namespace clang_format_lib
 
 inline auto version_to_uint(VERSION v)
 {
-    static std::map<VERSION, unsigned int> map_v_uint{
+    static const std::map<VERSION, unsigned int> map_v_uint{
         {VERSION::v3_5, 35u},   {VERSION::v3_7, 37u},   {VERSION::v3_8, 38u},   {VERSION::v5_0, 50u},
         {VERSION::v10_0, 100u}, {VERSION::v13_0, 130u}, {VERSION::v14_0, 140u}, {VERSION::v16_0, 160u},
         {VERSION::v17_0, 170u}, {VERSION::v18_0, 180u}};

@@ -2,6 +2,7 @@
 #define LIB_H
 
 #include <filesystem>
+#include <memory>
 #include <optional>
 #include <string>
 #include <vector>
@@ -46,7 +47,7 @@ enum class ALIGNMENT
     RIGHT
 };
 
-using setting_text = setting<const char*>;
+using setting_text = setting<const char *>;
 using setting_number = setting<unsigned int>;
 using setting_switch = setting<bool>;
 using setting_alignment = setting<ALIGNMENT>;
@@ -117,9 +118,18 @@ struct clang_format_settings
 
 const char * version();
 
-void parse_line(const std::string & line, clang_format_settings & settings) noexcept;
+class parser
+{
+  public:
+    parser(clang_format_settings &);
+    void parse_line(const std::string & line);
+    void finish();
+    ~parser();
 
-void parse_lines(const std::vector<std::string> & lines, clang_format_settings & settings) noexcept;
+  private:
+    class impl;
+    std::unique_ptr<impl> m_impl;
+};
 
 void generate_reference_file(std::vector<std::string> & lines);
 

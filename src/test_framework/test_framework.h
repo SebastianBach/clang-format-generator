@@ -3,25 +3,38 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <memory>
 #include <source_location>
 
-class test_result
+class [[nodiscard]] test_result
 {
-  public:
-    constexpr test_result() noexcept : m_failure(false) {}
-    constexpr test_result(const char * test_case, const char * test,
-                          const std::source_location & loc = std::source_location::current()) noexcept
-        : m_failure(true), m_test(test), m_test_case(test_case), m_line(loc.line()),
-          m_func(loc.function_name())
+  private:
+    test_result() noexcept {}
+
+    test_result(const char * test_case, const char * test, const std::source_location & loc) noexcept
+        : m_error(std::make_unique<error_info>(test, test_case, loc.line(), loc.function_name()))
     {
     }
 
-    constexpr auto failed() const noexcept { return m_failure; }
-    void print() const
+  public:
+    static test_result ok() noexcept { return test_result(); }
+
+    static test_result failure(const char * test_case, const char * test,
+                               const std::source_location & loc = std::source_location::current()) noexcept
     {
-        if (m_failure)
-            std::cout << "Error in test case \"" << m_test_case << "\", check \"" << m_test
-                      << "\"  at line " << m_line << " in function \"" << m_func << "\"\n";
+        return test_result{test_case, test, loc};
+    }
+
+    auto failed() const noexcept { return m_error.get() != nullptr; }
+
+    void print() const noexcept
+    {
+        if (failed())
+        {
+            auto * error = m_error.get();
+            std::cout << "Error in test case \"" << error->test_case << "\", check \"" << error->test
+                      << "\" at line " << error->line << " in function \"" << error->func << "\"\n";
+        }
     }
 
     static void print_success(const char * test_case, const char * test)
@@ -30,31 +43,56 @@ class test_result
     }
 
   private:
-    const bool m_failure;
-    const char * const m_test = nullptr;
-    const char * const m_test_case = nullptr;
-    const unsigned int m_line = 0;
-    const char * const m_func = nullptr;
+    struct error_info
+    {
+        const char * const test = nullptr;
+        const char * const test_case = nullptr;
+        const unsigned int line = 0;
+        const char * const func = nullptr;
+    };
+
+    const std::unique_ptr<error_info> m_error;
 };
 
-static constexpr test_result TEST_OK{};
+class test_case
+{
+  public:
+    test_case(const char * t) : _test_case(t) {}
+    ~test_case()
+    {
+        if (_success)
+            std::cout << "Success: " << _test_case << "\n";
+        else
+            std::cout << "Failure: " << _test_case << "\n";
+    }
+
+    const char * err() noexcept
+    {
+        _success = false;
+        return _test_case;
+    }
+
+  private:
+    const char * const _test_case;
+    bool _success = true;
+};
 
 #define TO_STRING(s) #s
 
-#define TEST_CASE(TEST) const char * __testcase = TEST;
+#define TEST_CASE(TEST) test_case __testcase{TEST};
 
 #define CHECK_TRUE(TEST)                                                                                  \
     if ((TEST) == false)                                                                                  \
-        return test_result(__testcase, TO_STRING(TEST));
+        return test_result::failure(__testcase.err(), TO_STRING(TEST));
 
 #define CHECK_FALSE(TEST)                                                                                 \
     if ((TEST) == true)                                                                                   \
-        return test_result(__testcase, TO_STRING(TEST));
+        return test_result::failure(__testcase.err(), TO_STRING(TEST));
 
 #define RUN(TEST)                                                                                         \
-    if (const auto res = TEST; res.failed())                                                              \
+    if (const auto testresult = TEST; testresult.failed())                                                \
     {                                                                                                     \
-        res.print();                                                                                      \
+        testresult.print();                                                                               \
         return EXIT_FAILURE;                                                                              \
     }
 
