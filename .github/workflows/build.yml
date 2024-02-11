@@ -74,4 +74,25 @@ jobs:
     - name: tests
       run: ctest
       working-directory: ./build
+      
+  build_win:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+      name: Check out the repository code
+
+    - name: build directory
+      run: mkdir build
+
+    - name: CMake
+      run: cmake -G "Visual Studio 17 2022" ..
+      working-directory: ./build
+
+    - name: build 
+      run: cmake --build . --config Release
+      working-directory: ./build
+
+    - name: tests
+      run: ctest -C Release  -VV
+      working-directory: ./build      
 
