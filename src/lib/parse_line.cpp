@@ -261,22 +261,14 @@ class parser::impl
         set_topics(topics);
     }
 
-    void parse_line(const std::string & line)
+    void parse_line(const std::string & line) { run_checks(line, false); }
+
+    void finish() { run_checks("", true); }
+
+    void run_checks(const std::string & line, bool finish)
     {
-        line_info info{line, settings, false};
+        line_info info{line, settings, finish};
 
-        run_checks(info);
-    }
-
-    void finish()
-    {
-        line_info info{"", settings, true};
-
-        run_checks(info);
-    }
-
-    void run_checks(line_info & info)
-    {
         for (auto & t : topics)
             if (!t.done)
                 t.done = t.func(info);
