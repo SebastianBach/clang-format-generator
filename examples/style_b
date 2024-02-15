@@ -1,0 +1,33 @@
+# created with https://github.com/SebastianBach/clang-format-generator
+# created for clang-format version 16.0
+
+Language: Cpp
+
+UseTab: Never
+IndentWidth: 4
+ColumnLimit: 107
+MaxEmptyLinesToKeep: 1
+FixNamespaceComments: true
+
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterControlStatement: true
+  AfterEnum: true
+  BeforeElse: true
+
+SpacesInConditionalStatement: false
+
+SpaceBeforeAssignmentOperators: true
+SpacesInSquareBrackets: false
+SpaceBeforeSquareBrackets: true
+PointerAlignment: Middle
+ReferenceAlignment: Pointer
+
+SpaceBeforeParens: Custom
+SpaceBeforeParensOptions:
+  AfterControlStatements: true
+  AfterFunctionDefinitionName: false
